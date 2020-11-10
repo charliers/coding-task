@@ -1,0 +1,29 @@
+{
+  "name": "coding-task",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsc -w",
+    "lint": "tslint '*.ts'",
+    "build": "npm build",
+    "clean": "rd node_modules /q /s",
+    "reinstall": "npm run clean && npm install",
+    "rebuild": "npm run clean && npm install && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.12.0",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-offline": "^3.33.0",
+    "uuid": "^3.1.0",
+    "@types/aws-sdk": "0.0.42",
+    "@types/node": "^7.0.5",
+    "tslint": "^5.5.0",
+    "tslint-config-standard": "^6.0.1",
+    "typescript": "^2.4.2"
+  }
+}
