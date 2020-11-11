@@ -2,49 +2,49 @@
 
 import { DynamoDB } from 'aws-sdk'
 
-const dynamoDb = new DynamoDB.DocumentClient({
-  region: process.env.DYNAMODB_REGION,
-  endpoint: process.env.DYNAMODB_URL,
-});
+const dynamoDb = new DynamoDB.DocumentClient();
 
 module.exports.update = (event, context, callback) => {
   const timestamp = new Date().getTime();
   const data = JSON.parse(event.body);
 
-  if (typeof data.userName !== 'string' || typeof data.id !== 'string' || 
-      typeof data.vatNumber !== 'string' || typeof data.userId !== 'string' ) {
-    console.error('Couldn\'t create the user entry. Validation Failed')
+  // validation
+  if (typeof data.text !== 'string' || typeof data.checked !== 'boolean') {
+    console.error('Validation Failed');
     callback(null, {
       statusCode: 400,
       headers: { 'Content-Type': 'text/plain' },
-      body: 'Couldn\'t create the user entry. Validation Failed',
-    })
-    return
+      body: 'Couldn\'t update the todo item.',
+    });
+    return;
   }
+
   const params = {
     TableName: process.env.DYNAMODB_TABLE,
     Key: {
-      id: data.id,
-      userId: data.userId
+      id: event.pathParameters.id,
+    },
+    ExpressionAttributeNames: {
+      '#todo_text': 'text',
     },
     ExpressionAttributeValues: {
-      ':userName': data.userName,
-      ':vatNumber': data.vatNumber,
-      ':updatedAt': timestamp
+      ':text': data.text,
+      ':checked': data.checked,
+      ':updatedAt': timestamp,
     },
-    UpdateExpression: 'set userName = :userName, vatNumber = :vatNumber, updatedAt = :updatedAt',
+    UpdateExpression: 'SET #todo_text = :text, checked = :checked, updatedAt = :updatedAt',
     ReturnValues: 'ALL_NEW',
   };
 
-console.log(params)
-    dynamoDb.update(params, (error, result) => {
+  // update the todo in the database
+  dynamoDb.update(params, (error, result) => {
     // handle potential errors
     if (error) {
       console.error(error);
       callback(null, {
         statusCode: error.statusCode || 501,
         headers: { 'Content-Type': 'text/plain' },
-        body: 'Couldn\'t fetch the user entry.',
+        body: 'Couldn\'t fetch the todo item.',
       });
       return;
     }

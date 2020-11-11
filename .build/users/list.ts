@@ -2,11 +2,7 @@
 
 import { DynamoDB } from 'aws-sdk'
 
-const dynamoDb = new DynamoDB.DocumentClient({
-  region: process.env.DYNAMODB_REGION,
-  endpoint: process.env.DYNAMODB_URL,
-});
-
+const dynamoDb = new DynamoDB.DocumentClient()
 const params = {
   TableName: process.env.DYNAMODB_TABLE,
   Select: 'ALL_ATTRIBUTES',
@@ -14,7 +10,8 @@ const params = {
 };
 
 module.exports.list = (event, context, callback) => {
-  //TODO add support for pagination
+  // fetch all todos from the database
+  // For production workloads you should design your tables and indexes so that your applications can use Query instead of Scan.
   dynamoDb.scan(params, (error, result) => {
     // handle potential errors
     if (error) {

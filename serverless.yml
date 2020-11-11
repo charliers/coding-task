@@ -1,12 +1,15 @@
 service: coding-task
 
-frameworkVersion: ">=2.0.0 <=2.11.1"
+frameworkVersion: ">=1.0.0 <=1.40.1"
 
 plugins:
+  - serverless-plugin-typescript
   - serverless-dynamodb-local
   - serverless-offline
 
 custom:
+  endpoints:
+    dynamodb-url: 'http://localhost:8000'
   dynamodb:
     stages:
       - dev
@@ -21,8 +24,16 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: us-east-1
+  timeout: 10
+  # memorySize: 128
+  logRetentionInDays: 14
+  deploymentPrefix: serverless
+  stackName: coding-task-stack
+  apiName: coding-task-api
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}-users
+    DYNAMODB_URL: ${self:custom.endpoints.dynamodb-url}
+    DYNAMODB_REGION: ${self:provider.region}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -39,13 +50,24 @@ provider:
         - "logs:CreateLogStream"
         - "logs:PutLogEvents"
       Resource: "*"
+  logs:
+    restApi: 
+      accessLogging: true 
+      format: 'requestId: $context.requestId' 
+      executionLogging: true 
+      level: INFO 
+      fullExecutionData: true
+package:
+ individually: true
+ include: 
+    - users/**
 
 functions:
   create:
     handler: users/create.create
     events:
       - http:
-          path: users
+          path: user
           method: post
           cors: true
 
@@ -61,15 +83,20 @@ functions:
     handler: users/get.get
     events:
       - http:
-          path: users/{id}
+          path: user
           method: get
           cors: true
+          request:
+            parameters:
+              querystrings:
+                id: true
+                userId: true
         
   update:
     handler: users/update.update
     events:
       - http:
-          path: users/{id}
+          path: user
           method: put
           cors: true        
 
@@ -82,12 +109,12 @@ resources:
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
-          - AttributeName: user-id
+          - AttributeName: userId
             AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-          - AttributeName: user-id
+          - AttributeName: userId
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
