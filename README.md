@@ -13,6 +13,10 @@ then
 
 `npm i`
 
+and finally
+
+`sls dynamodb install`
+
 For brevity, I have just demonstrated this to match with the users/create.ts, users/list.ts, users/get.ts, users/update.ts and users/delete.ts lambda function
 
 ## Usage
