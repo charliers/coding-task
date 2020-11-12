@@ -13,60 +13,93 @@ then
 
 `npm i`
 
-You can then run the compiler by running `tsc` in this directory. It will pull the settings from .tsconfig and extra @types
-from package.json. The output create.ts file is what will be uploaded by serverless.
-
-For brevity, I have just demonstrated this to match with the users/create.ts, users/list.ts, users/get.ts and users/update.ts lambda function
+For brevity, I have just demonstrated this to match with the users/create.ts, users/list.ts, users/get.ts, users/update.ts and users/delete.ts lambda function
 
 ## Usage
 
-You can create, retrieve, update, or delete users with the following commands:
+First, start Serverless framework offline mode:
+```bash
+serverless offline start --stage dev
+```
+
+You can create, retrieve, update, or delete users with the following commands or importing the postman collection at repository:
 
 ### Create a User
 
 ```bash
-curl -X POST https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/users --data '{ "id": "UID-123", "name": "robert", "vat-number": "DE123456","user-id": "gid:robert" }'
+curl -X POST http://localhost:3000/user --data '{"id": "UID-123", "userName": "robert", "vatNumber": "DE123456","userId": "gid:robert" }'
 ```
 
 Example Result:
 Status Code: 201
 ```bash
-{"id": "UID-123", "name": "robert", "vat-number": "DE123456","user-id": "gid:robert" }%
+{"id": "UID-123", "userName": "robert", "vatNumber": "DE123456","userId": "gid:robert" }%
+```
+
+Status Code: 400
+```bash
+{"message": "Couldn't create the user entry. Validation Failed"}%
 ```
 
 ### List all User
 ```bash
-curl https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/users
+curl http://localhost:3000/users
 ```
 
 Example output:
 Status Code: 200
 ```bash
-[{"id": "UID-123", "name": "robert", "vat-number": "DE123456","user-id": "gid:robert" }]%
+[{"id": "UID-123", "userName": "robert", "vatNumber": "DE123456","userId": "gid:robert" }]%
+```
+
+Status Code: 204
+```bash
+{}%
 ```
 
 ### Get one User
 
 ```bash
-# Replace the <id> part with a real id from your users table
-curl https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/users/<id>
+# Replace the <id> and <userId> part with a real data from your users table
+curl -X GET http://localhost:3000/user?id=UID-123&userId=gid:robert
 ```
 
-Example Result:
+Examples Results:
 Status Code: 200
 ```bash
-{"id": "UID-123", "name": "robert", "vat-number": "DE123456","user-id": "gid:robert" }%
+{"id": "UID-123", "userName": "robert", "vatNumber": "DE123456","userId": "gid:robert" }%
+```
+
+Status Code: 404
+```bash
+{"message": "Couldn't found the user entry."}%
 ```
 
 ### Update a User
 
 ```bash
-# Replace the <id> part with a real id from your users table
-curl -X PUT https://XXXXXXX.execute-api.us-east-1.amazonaws.com/dev/users/<id> --data '{ "name": "robert", "vat-number": "DE123456" }'
+curl -X PUT http://localhost:3000/user --data '{"id": "UID-123", "userName": "robert", "vatNumber": "DE123456","userId": "gid:robert" }'
 ```
 
 Example Result:
 Status Code: 200
 ```bash
-{"id": "UID-123", "name": "robert", "vat-number": "DE123456","user-id": "gid:robert" }%
+{"id": "UID-123", "userName": "robert", "vatNumber": "DE123456","userId": "gid:robert" }%
+```
+
+Status Code: 400
+```bash
+{"message": "Couldn't create the user entry. Validation Failed"}%
+```
+
+### Delete a User
+
+```bash
+curl -X DELETE http://localhost:3000/user?id=UID-123&userId=gid:robert
+```
+
+Example Result:
+Status Code: 200
+```bash
+{}%
 ```

@@ -23,7 +23,7 @@ const apiResponses = {
         return {
             statusCode: 400,
             headers: { 'Content-Type': 'text/plain' },
-            body: body,
+            body: JSON.stringify(body, null, 2),
         };
     },
     _404: (body: { [key: string]: any }) => {
