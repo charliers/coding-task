@@ -1,6 +1,10 @@
 'use strict';
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const aws_sdk_1 = require("aws-sdk");
+const apiResponses_1 = __importDefault(require("../commons/apiResponses"));
 const dynamoDb = new aws_sdk_1.DynamoDB.DocumentClient({
     region: process.env.DYNAMODB_REGION,
     endpoint: process.env.DYNAMODB_URL,
@@ -16,19 +20,17 @@ module.exports.list = (event, context, callback) => {
         // handle potential errors
         if (error) {
             console.error(error);
-            callback(null, {
-                statusCode: error.statusCode || 501,
-                headers: { 'Content-Type': 'text/plain' },
-                body: 'Couldn\'t fetch the todo items.',
-            });
+            callback(null, apiResponses_1.default._500({ message: 'Couldn\'t fetch the user entries.' }));
             return;
         }
-        // create a response
-        const response = {
-            statusCode: 200,
-            body: JSON.stringify(result.Items),
-        };
-        callback(null, response);
+        else {
+            if (Object.keys(result.Items).length === 0) {
+                callback(null, apiResponses_1.default._204());
+            }
+            else {
+                callback(null, apiResponses_1.default._200(result.Items));
+            }
+        }
     });
 };
 //# sourceMappingURL=list.js.map

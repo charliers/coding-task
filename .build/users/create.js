@@ -1,6 +1,10 @@
 'use strict';
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const aws_sdk_1 = require("aws-sdk");
+const apiResponses_1 = __importDefault(require("../commons/apiResponses"));
 const dynamoDb = new aws_sdk_1.DynamoDB.DocumentClient({
     region: process.env.DYNAMODB_REGION,
     endpoint: process.env.DYNAMODB_URL,
@@ -11,11 +15,7 @@ module.exports.create = (event, context, callback) => {
     if (typeof data.userName !== 'string' || typeof data.id !== 'string' ||
         typeof data.vatNumber !== 'string' || typeof data.userId !== 'string') {
         console.error('Couldn\'t create the user entry. Validation Failed');
-        callback(null, {
-            statusCode: 400,
-            headers: { 'Content-Type': 'text/plain' },
-            body: 'Couldn\'t create the user entry. Validation Failed',
-        });
+        callback(null, apiResponses_1.default._400({ message: 'Couldn\'t create the user entry. Validation Failed' }));
         return;
     }
     const params = {
@@ -35,19 +35,11 @@ module.exports.create = (event, context, callback) => {
         // handle potential errors
         if (error) {
             console.error(error);
-            const response = {
-                statusCode: error.statusCode,
-                body: JSON.stringify(params.Item)
-            };
-            callback(null, response);
+            callback(null, apiResponses_1.default._500({ message: 'Couldn\'t create the user entry.' }));
             return;
         }
         else {
-            const response = {
-                statusCode: 200,
-                body: JSON.stringify(params.Item)
-            };
-            callback(null, response);
+            callback(null, apiResponses_1.default._201(params.Item));
         }
     });
 };

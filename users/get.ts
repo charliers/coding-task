@@ -1,6 +1,7 @@
 'use strict';
 
-import { DynamoDB } from 'aws-sdk'
+import { DynamoDB } from 'aws-sdk';
+import apiResponses from '../commons/apiResponses';
 
 const dynamoDb = new DynamoDB.DocumentClient({
   region: process.env.DYNAMODB_REGION,
@@ -16,26 +17,26 @@ module.exports.get = (event, context, callback) => {
       userId: event.queryStringParameters.userId
     },
   };
-console.log(params)
+  
+  console.debug(params)
 
   dynamoDb.get(params, (error, result) => {
 
     if (error) {
       console.error(error);
-      callback(null, {
-        statusCode: error.statusCode || 501,
-        headers: { 'Content-Type': 'text/plain' },
-        body: 'Couldn\'t fetch the user entry.',
-      });
+      callback(null, apiResponses._500({ message: 'Couldn\'t fetch the user entry.' }) );
       return;
     }
     else {
+      if(Object.keys(result).length === 0){
+        console.log(Object.keys(result).length)
 
-      const response = {
-        statusCode: (Object.keys(result).length === 0)? 404: 200,
-        body: JSON.stringify(result.Item),
-      };
-      callback(null, response);
+        callback(null, apiResponses._404({message: 'Couldn\'t found the user entry.'}) );
+      } else {
+        console.log(result)
+        callback(null, apiResponses._200(result.Item));
+        
+      }     
       
     }
   });

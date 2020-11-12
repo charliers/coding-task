@@ -1,6 +1,7 @@
 'use strict';
 
-import { DynamoDB } from 'aws-sdk'
+import { DynamoDB } from 'aws-sdk';
+import apiResponses from '../commons/apiResponses';
 
 const dynamoDb = new DynamoDB.DocumentClient({
   region: process.env.DYNAMODB_REGION,
@@ -19,19 +20,16 @@ module.exports.list = (event, context, callback) => {
     // handle potential errors
     if (error) {
       console.error(error);
-      callback(null, {
-        statusCode: error.statusCode || 501,
-        headers: { 'Content-Type': 'text/plain' },
-        body: 'Couldn\'t fetch the todo items.',
-      });
+      callback(null, apiResponses._500({ message: 'Couldn\'t fetch the user entries.' }));
       return;
-    }
+    } else{
 
-    // create a response
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify(result.Items),
-    };
-    callback(null, response);
+      if(Object.keys(result.Items).length === 0){
+        callback(null, apiResponses._204());
+      } else {
+        callback(null, apiResponses._200(result.Items));
+      }  
+    }
+    
   });
 };

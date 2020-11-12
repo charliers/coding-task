@@ -1,8 +1,7 @@
 'use strict'
 
-import * as uuid from 'uuid'
-
-import { DynamoDB } from 'aws-sdk'
+import { DynamoDB } from 'aws-sdk';
+import apiResponses from '../commons/apiResponses';
 
 const dynamoDb = new DynamoDB.DocumentClient({
   region: process.env.DYNAMODB_REGION,
@@ -16,11 +15,7 @@ module.exports.create = (event, context, callback) => {
   if (typeof data.userName !== 'string' || typeof data.id !== 'string' || 
       typeof data.vatNumber !== 'string' || typeof data.userId !== 'string' ) {
     console.error('Couldn\'t create the user entry. Validation Failed')
-    callback(null, {
-      statusCode: 400,
-      headers: { 'Content-Type': 'text/plain' },
-      body: 'Couldn\'t create the user entry. Validation Failed',
-    })
+    callback(null, apiResponses._400({ message: 'Couldn\'t create the user entry. Validation Failed' }))
     return
   }
 
@@ -42,20 +37,11 @@ module.exports.create = (event, context, callback) => {
     // handle potential errors
     if (error) {
       console.error(error)
-      const response = {
-        statusCode: error.statusCode,
-        body: JSON.stringify(params.Item)
-      }
-      callback(null, response)
+      callback(null, apiResponses._500({ message: 'Couldn\'t create the user entry.' }))
       return
     }
     else {    
-
-      const response = {
-        statusCode: 200,
-        body: JSON.stringify(params.Item)
-      }
-      callback(null, response)
+      callback(null, apiResponses._201(params.Item))
     }
   })
 }
