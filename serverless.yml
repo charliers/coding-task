@@ -1,9 +1,10 @@
 service: coding-task
 
-frameworkVersion: ">=1.0.0 <=1.40.1"
+frameworkVersion: ">=1.80.0"
 
 plugins:
   - serverless-plugin-typescript
+  - serverless-jest-plugin
   - serverless-dynamodb-local
   - serverless-offline
 
@@ -99,8 +100,20 @@ functions:
       - http:
           path: user
           method: put
-          cors: true        
+          cors: true       
 
+  delete:
+    handler: users/delete.delete
+    events:
+      - http:
+          path: user
+          method: delete
+          cors: true
+          request:
+            parameters:
+              querystrings:
+                id: true
+                userId: true
 resources: 
   Resources:
     usersTable:

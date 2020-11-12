@@ -109,11 +109,40 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Delete User",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/user?id=UID-1234&userId=gid:charlie",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"user"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "UID-1234"
+						},
+						{
+							"key": "userId",
+							"value": "gid:charlie"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
 		{
-			"id": "ecbfe2c2-f4fe-4d06-8a4a-752c035b7cba",
+			"id": "e14ae5ca-5224-4349-8aff-aae7b9f33b3c",
 			"key": "env",
 			"value": "dev"
 		}
